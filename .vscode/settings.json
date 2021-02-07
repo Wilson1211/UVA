@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "BUCKET_sol.C": "cpp",
+        "thread": "cpp"
+    }
+}

@@ -4,7 +4,7 @@
 #include <string.h>
 #include<ios> //used to get stream size
 #include<limits> //used to get numeric limits
-
+#include <algorithm>
 using namespace std;
 
 const int maxn = 144; // 144  
@@ -33,8 +33,35 @@ Player::Player(){
     total = 0;
 }
 
-void cmp1(){
+bool cmp1(const Player &a, const Player &b){ // true: a,b ; false: b,a
 
+
+
+    if((a.dq)&&(b.dq)){
+        if(a.rnd == b.rnd){
+                return strcmp(b.name, a.name); 
+            }else{
+                return (b.rnd < a.rnd);
+            }
+    }else{
+        if((a.dq) != (b.dq)){
+            return (a.dq < b.dq);
+        }else{ // both are qualified
+            if(a.first2rd == b.first2rd){
+                return strcmp(b.name, a.name); 
+            }else{
+                return (b.first2rd < a.first2rd);
+            }
+        }
+    }
+}
+
+bool cmp2(const Player &a, const Player &b){
+    if(a.total == b.total){
+        return strcmp(b.name, a.name); 
+    }else{
+        return (a.total > b.total);
+    }
 }
 
 
@@ -109,9 +136,18 @@ int main(){
 
         //round 1, sort with 
         sort(player, player+num_player, cmp1);
-
         
+        int i;
+        for(i=0;i<num_player;i++){
+            if(player[i].dq){
+                break;
+            }
+        }
+        if(i < num_player){
+            num_player = i-1;
+        }
 
+        sort(player, player+num_player, cmp2);
 
     }
 
