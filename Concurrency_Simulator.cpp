@@ -22,11 +22,35 @@ class prog{
 public:
     prog(){}
     prog(int a, int b, int c)
-        :id(a),index(b), quota
+        :id(a),index(b), quota(c)
     {}
+    // prog(prog const &program){
+    //     index = program.index;
+    //     id = program.id;
+    //     quota = program.quota;
+    // }
+
+    prog operator = (prog const &obj){
+        prog a;
+        a.index = obj.index;
+        a.id = obj.id;
+        a.quota = obj.quota;
+        return a;
+    }
+
     void setp(int a){
         index = a;
     }
+    int get_index(){
+        return index;
+    }
+    int get_id(){
+        return id;
+    }
+    int get_quota(){
+        return quota;
+    }
+private:
     int id; // program id
     int index; // cmd in the token
     int quota;
@@ -37,7 +61,7 @@ queue<prog> lc;//lock queue
 int a[26]; // represent variable
 
 int n, t1, t2, t3, t4, t5, Q;
-int lock = 0;
+int lckk = -1;
 void command_time(vector<vector<string>> &command, vector<vector<int>> &time){
     int sz = command.size();
     FOR(z, 0, sz){
@@ -66,29 +90,37 @@ void command_time(vector<vector<string>> &command, vector<vector<int>> &time){
 
 inline void process_lck(prog &program, int k){
     if(k==1){ // lock
-        if(lock==1){
-            lc.push_back(program);
+        if(lckk>=0 && (lckk!=program.get_id())){
+            lc.push(program);
         }else{
-            lock=1;
+            lckk=program.get_id();
         }
     }else{
-        lock = 0;
-        prog program = lc.pop();
-        ready.push_front(program);
+            lckk = -1;
+        if(lc.size()>0){
+            prog program = lc.front();
+            lckk = program.get_id();
+            ready.push_front(program);
+            lc.pop();
+        }
     }
 }
 
-inline void process_var(int id, strint str){
+inline void process_var(prog program, string str){
     string str1;
     size_t found;
-    
+    int id = program.get_id();
     found = str.find(' ');
     str1 = str.substr(0, found);
+    // cout<<"str: "<<str<<endl;
+    // if(str=="b = 9"){
+    //     cout<<"here\n";
+    // }
     if(str1=="print"){
         str1 = str.substr(found+1);
-        cout<<id<<": "<<a[str1-'a']<<endl;
-    }else if(lock==0){ // assign value to var
-        int index = str1-'a';
+        cout<<id+1<<": "<<a[str1[0]-'a']<<endl;
+    }else if(lckk<0 || lckk==id){ // assign value to var
+        int index = str1[0]-'a';
         str1 = str.substr(found+3);
         stringstream ss;
         ss << str1;
@@ -106,13 +138,15 @@ int main() {
     cin.ignore();
     FOR(z, 0, n){
         vector<string> tmp;
-        while(getline(cin, str)&&(str!="end")){
+        while(getline(cin, str)){
             tmp.eb(str);
+            if(str=="end") break;
         }
         command.eb(tmp);
 
         prog tt(z, 0, Q);
-        ready.push(tt);
+        ready.push_back(tt);
+//        cout<<"readysize: "<<ready.size()<<endl;
     }
 
     vector<vector<int>> time;// record each cmd time
@@ -121,29 +155,42 @@ int main() {
     command_time(command, time);
 
     int count_end =0 ;
-    while(count_end < n){
+   // cout<<"readysize: "<<ready.size()<<endl;
+    while(count_end < n && (ready.size()>0)){
+       // cout<<"inside\n";
         string str;
-        prog program = ready.pop_front;
-        int index = program.index;
-        int id = program.id;
+        prog program = ready.front();
+        ready.pop_front();
+        int index = program.get_index();
+        int id = program.get_id();
+//        cout<<"id: "<<id<<" str: "<<command[id][index]<<endl;
         int quota = Q;
         while(quota>0){
             quota -= time[id][index];
             if(quota >= 0){ // this cmd can be excuted
                 string str = command[id][index];
+//                cout<<"here str: "<<str<<endl;
                 if(str=="lock"){
                     process_lck(program, 1);
-                    break;
+                    if(lckk!=id)break;
                 }else if(str == "unlock"){
                     process_lck(program, 0);
                 }else if(str == "end"){
                     /* do nothing */
+                    count_end++;
+                    break;
                 }else{ // assign var or print
-                    process_var(id, str);
+                    process_var(program, str);
                 }
-
-            }else{ // need to go back to ready queue
+            }
+            if(quota>0){
+                program.setp(++index);
+            }
+            if(quota<=0){ // need to go back to ready queue
                 time[id][index] = 0-quota;
+                if(quota==0){
+                    program.setp(++index);
+                }
                 ready.push_back(program);
             }
         }
