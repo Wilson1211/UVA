@@ -1,6 +1,15 @@
 {
     "files.associations": {
         "BUCKET_sol.C": "cpp",
-        "thread": "cpp"
-    }
+        "thread": "cpp",
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "*.tcc": "cpp",
+        "bitset": "cpp",
+        "fstream": "cpp",
+        "type_traits": "cpp",
+        "string": "cpp",
+        "vector": "cpp"
+    },
+    "C_Cpp.errorSquiggles": "Disabled"
 }
