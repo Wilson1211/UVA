@@ -20,17 +20,45 @@ typedef pair<ll,ll> pll;
 
 
 int arr[27][27];
+
+bool euler(int u){
+    FOR1(i, 1, 27){
+        if(arr[u][i]>0){
+
+        }
+    }
+}
+bool checkdeg(){
+    int source = 1;
+    int dest = 1;
+    FOR1(i, 1, 27){
+        int sum
+    }
+}
 int main() {
 
     int T;
     cin >> T;
     int n;
+    string str;
     while(T--){
         cin >> n;
         while(n--){
-            memset(arr)
+            memset(arr, 0, 27*27*sizeof(int));
+            int sz, first,end;
+            cin >> str;
+            first = str[0]-'a';
+            sz = str.length();
+            end = str[sz-1]='a';
+            arr[first][end]++;
         }
 
+        bool flag;
+        // first check degree
+        flag = checkdeg();
+        FOR1(i, 1, 27){
+            flag = euler(i);
+        }
 
     }
 
