@@ -26,7 +26,7 @@ set<int> exist;
 class node{
 public:
     node(){}
-    vector<node> next;
+    set<int> next;
 };
 node Node[53];
 
@@ -35,11 +35,16 @@ bool process_dfs(int i){
     if(existed[i]==1){
         return 1;
     }
+    existed[i] = 1;
     int sz = (Node[i].next).size();
     bool flag = 0;
-    FOR(j, 0, sz){
-        flag = process_dfs((Node[i].next)[j]);
-        if(flag == 1) return 1;
+    set<int>::iterator it = (Node[i].next).begin();
+    for(it = (Node[i].next).begin();it!=(Node[i].next).end();it++){
+        if(exist.find(53-(*it))!=exist.end()){
+            flag = process_dfs(53-(*it));
+            if(flag == 1) return 1;
+            else existed[53-*it]=0;
+        }
     }
     return 0;
 }
@@ -50,11 +55,17 @@ int main() {
     string D="ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     FOR(i, 0, 26){
         string tmp;
-        tmp = D[i]+'+';
-        dic.insert(make_pair(tmp, i));
-        tmp = D[i]+'-';
-        dic.insert(make_pair(tmp, i+26));
+        tmp = D.substr(i,1);
+        tmp += "+";
+        dic.insert(make_pair(tmp, i+1));
+        tmp = D.substr(i,1);
+        tmp += "-";
+        dic.insert(make_pair(tmp, 52-i));
     }
+    // map<string, int>::iterator it;
+    // for(it = dic.begin();it!=dic.end();it++){
+    //     cout<<(string)(it->X)<<" "<<it->Y<<endl;
+    // }
     while(cin>>K){
         FOR(i, 0, K){
             cin>>str;
@@ -71,13 +82,13 @@ int main() {
             FOR(j, 0, k){
                 FOR(l, 0, k){
                     if(j!=l){
-                        (Node[num[j]].next).eb(num[l]);
+                        (Node[num[j]].next).insert(num[l]);
                     }
                 }
             }
         }
         bool flag=0;
-        FOR(i, 0, 52){
+        FOR1(i, 1, 52){
             if(exist.find(i)!=exist.end()){
                 memset(existed, 0, 53*sizeof(int));
                 flag = process_dfs(i);
