@@ -37,6 +37,7 @@ int main() {
     int T;
     cin >> T;
     int n;
+    string str;
     while(T--){
         int count = 0;
         cin >> n;
