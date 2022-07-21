@@ -18,14 +18,14 @@ typedef pair<ll,ll> pll;
 #define X first
 #define Y second
 
-#define maxn 100001
+#define maxn 101
 
-int edge[100001][100001]; // color
-int ccount[100001][100001]; // distance from n
-int mincount[100001];
-int existed[100001];
+int edge[101][101]; // color
+int ccount[101][101]; // distance from n
+int mincount[101];
+int existed[101];
 
-int n, m;
+int N, M;
 int ddist;
 vector<int> ans;
 void p_ans(){
@@ -40,20 +40,22 @@ void dfs(int, int);
 void bfs(int node, int cnt){ // cnt belongs to the layer of node's neighbor
 
     //existed[node] = 1;
-    FOR(i, 1, n){ // no need to test n
+    FOR(i, 1, N){ // no need to test n
         if((i!=node)&&(edge[i][node]!=0) && (mincount[i]>=cnt)){ //
             if(mincount[i]>cnt) mincount[i] = cnt; 
             //if(ccount[i][node] > cnt) ccount[i][node] = cnt;
             ccount[i][node] = cnt;
             if(i!=1) bfs_que.push(i);
             else{ // i==1
-                if(ddist < cnt) ddist = cnt;
+                if(ddist > cnt) ddist = cnt;
             }
         }
     }
-    int nn = bfs_que.front();
-    bfs_que.pop();
-    bfs(nn, cnt+1);
+    if(bfs_que.size()>0){
+        int nn = bfs_que.front();
+        bfs_que.pop();
+        bfs(nn, ccount[nn][node]+1);
+    }
 }
     
 
@@ -62,27 +64,25 @@ int main() {
     stringstream ss;
     while(getline(cin, intp)&&(intp!="")){
         ss << intp;
-        ss >> n; ss >> m;
+        ss >> N; ss >> M;
 
         memset(edge, 0, sizeof(int)*maxn*maxn);
-        memset(existed, 0, sizeof(int)*100001);
-        memset(mincount, maxn, sizeof(int)*100001);
-        memset(ccount, maxn, sizeof(int)*100001*100001);
+        memset(existed, 0, sizeof(int)*maxn);
+        memset(mincount, maxn, sizeof(int)*maxn);
+        memset(ccount, maxn, sizeof(int)*maxn*maxn);
         ddist = maxn;
         int a,b,c;
-        FOR(i, 0, m){
-            getline(cin, intp);
-            ss << intp;
-            ss >> a; ss >> b; ss >> c;
+        FOR(i, 0, M){
+            cin >> a >> b >> c;
 
             edge[a][b] = c;
             edge[b][a] = c;
         }
 
 
-        bfs(n,1);
+        bfs(N,1);
 
-        dfs(1, ddist-1);
+        dfs(1, ddist);
 
 
         // existed[n] = 1;
@@ -95,17 +95,17 @@ int main() {
 }
 
 void dfs(int node, int dist){
-    if(node == n){
+    if(node == N){
         p_ans();
     }
     else{
         int mincol = maxn;
-        FOR1(i, 2, n){
+        FOR1(i, 2, N){
             if(ccount[node][i]==dist){
                 if(mincol > edge[node][i]) mincol = edge[node][i];
             }
         }
-        FOR1(i, 2, n){
+        FOR1(i, 2, N){
             if(ccount[node][i]==dist && (edge[node][i]==mincol)){
                 ans.eb(i);
                 dfs(i, dist-1);
